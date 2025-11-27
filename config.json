@@ -1,0 +1,36 @@
+{
+  "instruments": [
+    {
+      "symbol": "NIFTY",
+      "timeframe": "5m",
+      "rsi_length": 14,
+      "rsi_level": 30,
+      "profit_target_pct": 5.0,
+      "stop_loss_pct": 10.0,
+      "quantity": 1,
+      "exchange": "NFO",
+      "symbol_token": "99926000",
+      "product_type": "INTRADAY"
+    },
+    {
+      "symbol": "BANKNIFTY",
+      "timeframe": "5m",
+      "rsi_length": 14,
+      "rsi_level": 30,
+      "profit_target_pct": 5.0,
+      "stop_loss_pct": 10.0,
+      "quantity": 1,
+      "exchange": "NFO",
+      "symbol_token": "99926009",
+      "product_type": "INTRADAY"
+    }
+  ],
+  "smart_api": {
+    "enabled": true,
+    "api_key": "VAtUBSmW",
+    "client_id": "",
+    "password": "",
+    "totp_secret": "2IUHQ3HHK2AERNAQK5J2TWA7O4"
+  }
+}
+
