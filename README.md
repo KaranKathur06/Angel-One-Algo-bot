@@ -27,14 +27,41 @@ version control with blank placeholders.
 
 ## GUI trading bot
 
-The legacy CLI workflow has been replaced with a full desktop GUI
-(`Tkinter`). Launch it with:
+The bot supports two GUI options:
+
+### Option 1: Streamlit Web GUI (Recommended for servers)
+
+Perfect for headless servers and remote access. Runs as a web application accessible via browser.
+
+```bash
+# Install dependencies (if not already installed)
+pip install -r requirements.txt
+
+# Run the Streamlit app
+streamlit run streamlit_app.py
+```
+
+The app will be available at `http://localhost:8501` (or your server's IP:8501).
+
+**For production servers**, you can run it with custom host/port:
+
+```bash
+streamlit run streamlit_app.py --server.port 8501 --server.address 0.0.0.0
+```
+
+### Option 2: Tkinter Desktop GUI (Local use only)
+
+For local desktop use (requires X11 display). Launch it with:
 
 ```bash
 python gui_trading_bot.py
 ```
 
+**Note:** Tkinter requires a display server and won't work on headless servers. Use Streamlit for server deployments.
+
 ### GUI pages
+
+Both GUIs provide the same functionality:
 
 - **Dashboard** – start/stop the threaded strategy, monitor status, and view
   live logs without blocking the UI.
