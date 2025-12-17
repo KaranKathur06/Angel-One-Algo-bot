@@ -25,11 +25,11 @@ The bot automatically loads `.env` (via `python-dotenv`) and overrides
 the `smart_api` section in `config.json`, so you can keep that file in
 version control with blank placeholders.
 
-## GUI trading bot
+## Trading Bot - Streamlit Web GUI
 
-The bot supports two GUI options:
+The bot uses a Streamlit web interface for real-time trading with SmartAPI integration.
 
-### Option 1: Streamlit Web GUI (Recommended for servers)
+### Running the Bot
 
 Perfect for headless servers and remote access. Runs as a web application accessible via browser.
 
@@ -49,31 +49,71 @@ The app will be available at `http://localhost:8501` (or your server's IP:8501).
 streamlit run streamlit_app.py --server.port 8501 --server.address 0.0.0.0
 ```
 
-### Option 2: Tkinter Desktop GUI (Local use only)
+### Desktop .exe build and usage (no Python required at runtime)
 
-For local desktop use (requires X11 display). Launch it with:
+1. Use Python 3.10 or 3.11 on a build machine.
+2. Install build-time deps:
+   ```bash
+   python -m pip install --upgrade pip
+   pip install -r requirements.txt
+   pip install pyinstaller
+   ```
+3. Build the single-click executable:
+   ```bash
+   pyinstaller desktop_launcher.py ^
+     --onefile ^
+     --noconsole ^
+     --name AngelOneTradingBot ^
+     --hidden-import SmartApi ^
+     --hidden-import streamlit ^
+     --hidden-import pandas ^
+     --hidden-import numpy ^
+     --hidden-import pyotp ^
+     --hidden-import requests ^
+     --hidden-import pywebview
+   ```
+   (Use `\` line breaks on macOS/Linux instead of `^`.)
+4. Copy the resulting `dist/AngelOneTradingBot.exe` to the desired folder.
+5. Place `.env` in the **same folder as the .exe** with:
+   ```
+   SMART_API_ENABLED=true
+   SMART_API_KEY=...
+   SMART_API_CLIENT_ID=...
+   SMART_API_PIN=...
+   SMART_API_TOTP_SECRET=...
+   ```
+   If `.env` is missing, the launcher shows a secure first-run prompt and creates it for you (secrets stay local).
+6. Double-click `AngelOneTradingBot.exe`. The launcher:
+   - Starts Streamlit on a free local port
+   - Opens the UI automatically (embedded via pywebview when available, otherwise your default browser)
+   - Keeps the Streamlit process alive until you close the app
 
-```bash
-python gui_trading_bot.py
-```
+Troubleshooting:
+- If the UI does not appear, check `launcher.log` next to the .exe.
+- Ensure firewalls allow `localhost` traffic.
+- If the port is in use, relaunch; the launcher picks a new free port automatically.
+- To stop everything, close the pywebview window or end the `AngelOneTradingBot.exe` process (the child Streamlit process is shut down cleanly).
 
-**Note:** Tkinter requires a display server and won't work on headless servers. Use Streamlit for server deployments.
+### GUI Features
 
-### GUI pages
+The Streamlit interface provides:
 
-Both GUIs provide the same functionality:
+- **Dashboard** – start/stop the trading bot, monitor SmartAPI connection status, view live logs, and track system metrics
+- **Instruments** – add, edit, remove, and review all configured symbols with RSI/target/stop parameters, intervals, and SmartAPI tokens
+- **Positions** – real-time snapshot of open positions from SmartAPI positionBook() with live P&L calculated from current market prices
+- **Settings** – inspect or edit `config.json`, reload from disk, validate SmartAPI connectivity, check available funds, and force-save configuration
 
-- **Dashboard** – start/stop the threaded strategy, monitor status, and view
-  live logs without blocking the UI.
-- **Instruments** – add, edit, remove, and review all configured symbols with
-  RSI/target/stop parameters and intervals.
-- **Positions** – live snapshot of open positions with entry/current price,
-  P&L%, timestamps, and strategy context.
-- **Settings** – inspect or edit `config.json`, reload from disk, or force-save
-  the in-memory configuration.
+### Key Features
 
-All changes made via the GUI persist back to `config.json`, and SmartAPI
-credentials remain sourced from `.env`.
+- **Real SmartAPI Integration**: All orders are placed via SmartAPI - no simulated trades
+- **Fund Validation**: Checks available funds before placing orders using `rmsLimit()`
+- **Order Verification**: Verifies order execution using `orderBook()` before creating positions
+- **Real-time P&L**: Calculates P&L using live prices from SmartAPI `ltpData()`
+- **Position Sync**: Positions are synced from SmartAPI `positionBook()` - only real positions are shown
+- **RSI Crossover Logic**: Correct crossover detection (previous_RSI < threshold AND current_RSI >= threshold)
+- **SmartAPI Candle Data**: Fetches real-time candles from SmartAPI instead of yfinance
+
+All changes made via the GUI persist back to `config.json`, and SmartAPI credentials remain sourced from `.env`.
 
 ### Additional Required Packages
 
